@@ -1,0 +1,87 @@
+---
+title: "Fitbit"
+author: "Marwa"
+date: "12/16/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(Hmisc)
+library(dplyr)
+```
+
+## Activity Monitoring Data
+
+Reading the data 
+```{r}
+activity <- read.csv("activity.csv")
+
+```
+
+Transforming the data 
+```{r}
+TotalSteps <- tapply(activity$steps,activity$date,sum, na.rm=TRUE)
+
+```
+
+
+Plot for steps taken each day
+
+```{r}
+hist(TotalSteps)
+```
+
+The mean and median total number of steps taken per day
+```{r}
+Mean <- mean(TotalSteps)
+Median <- median(TotalSteps)
+
+Mean
+Median
+
+```
+
+Time series plot of the average number of steps taken
+```{r}
+average_step <- aggregate(steps ~ interval, data = activity, mean, na.rm = TRUE)
+plot(average_step$interval, average_step$steps, type = "l", lwd = 2, col = "blue",
+     main = "Average Number of Steps Taken", axes =TRUE, 
+     xlab = "5-min interval", ylab = "Average no of steps")
+```
+
+The 5-minute interval that, on average, contains the maximum number of steps
+```{r}
+av <- tapply(activity$steps, activity$interval, mean, na.rm = T)
+which.max(av)
+```
+average_steps
+Code to describe and show a strategy for imputing missing data
+a. the total number of missing values in the dataset (i.e. the total number of rows with NAs)
+```{r}
+length(which(is.na(activity$steps)))
+```
+
+b. Imputed values 
+```{r}
+missingdata_Imputed <- activity
+missingdata_Imputed$steps <- impute(activity$steps, fun=mean)
+```
+
+plotting a histogram  total number of steps taken each day 
+```{r}
+TotalStepsImputed <- tapply(missingdata_Imputed$steps,missingdata_Imputed$date,sum, na.rm=TRUE)
+hist(TotalStepsImputed)
+
+```
+
+The New median and mean
+```{r}
+Mean <- mean(TotalStepsImputed)
+Median <- median(TotalStepsImputed)
+
+Mean
+Median
+
+```
+
